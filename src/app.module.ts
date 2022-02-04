@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigurationService } from './configuration/configuration/configuration.service';
+import { ConfigurationService } from './configuration/configuration.service';
 
 /**
  * Set the used port in the constructor
