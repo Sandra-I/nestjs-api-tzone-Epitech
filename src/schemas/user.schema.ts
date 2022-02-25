@@ -1,39 +1,31 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import * as mongoose from 'mongoose';
+import { User } from 'src/user/entities/user.entity';
 
-@Schema()
-export class User {
-    @Prop()
-    googleId: string;
+export type UserDocument = User & Document;
 
-    @Prop()
-    history: {
-        text: string,
+export const UserSchema = new mongoose.Schema({
+    firstName: String,
+    lastName: String,
+    email: String,
+    history: [{
+        text: String,
         date: Date
-    }[]
-
-    @Prop()
+    }],
     settings: {
-        langage: string,
-        preview: boolean
-    }
-
-    @Prop()
-    payment: {
-        date: Date;
-        total: number;
-    }[]
-
-    @Prop()
-    subscription: {
-        plan: {
-            type: Types.ObjectId,
+        langage: String,
+        preview: Boolean
+    },
+    payment: [{
+        date: Date,
+        total: Number
+    }],
+    subscription: [{
+        planId: {
+            type: mongoose.Types.ObjectId,
             ref: 'Plan'
         },
         startDate: Date,
         endDate: Date,
-        automaticRenewal: boolean
-    }
-}
-
-export const UserSchema = SchemaFactory.createForClass(User);
+        annual: Boolean
+    }]
+});

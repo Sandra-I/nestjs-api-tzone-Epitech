@@ -1,28 +1,14 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import * as mongoose from 'mongoose';
+import { Plan } from 'src/plan/entities/plan.entity';
 
-@Schema()
-export class Plan {
+export type PlanDocument = Plan & Document;
 
-    @Prop()
-    name: string;
-
-    @Prop()
-    selection: boolean;
-
-    @Prop()
-    preview: boolean;
-
-    @Prop()
-    quickCopy: boolean;
-    
-    @Prop()
-    fontRecuperation: boolean;
-    
-    @Prop()
-    history: boolean;
-
-    @Prop()
-    translation: boolean;
-}
-
-export const PlanSchema = SchemaFactory.createForClass(Plan);
+export const PlanSchema = new mongoose.Schema({
+    name: String,
+    selection: Boolean,
+    preview: Boolean,
+    quickCopy: Boolean,
+    fontRecuperation: Boolean,
+    history: Boolean,
+    translation: Boolean
+});
