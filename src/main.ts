@@ -8,7 +8,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('TZone - API')
     .setVersion('1.0')
-    .addTag('tzone')
+    .addBearerAuth()
+    .addOAuth2()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

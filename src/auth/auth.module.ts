@@ -16,7 +16,7 @@ import { GoogleStrategy } from './google.strategy';
             signOptions: { expiresIn: '2 days' },
         }),
     ],
-    providers: [AuthService, GoogleStrategy, JwtStrategy],
+    providers: [AuthService],
     exports: [AuthService],
 })
 export class AuthModule { }
