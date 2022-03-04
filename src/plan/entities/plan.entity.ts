@@ -4,7 +4,7 @@ export class Plan {
     selection: boolean;
     preview: boolean;
     quickCopy: boolean;
-    fontRecuperation: boolean;
+    // fontRecuperation: boolean;
     history: boolean;
     translation: boolean;
 }

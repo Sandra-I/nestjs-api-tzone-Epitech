@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
+import { UserService } from './../user/user.service';
 import { AuthService } from './auth.service';
 import { GoogleUser } from './entities/google.entity';
 
 @Injectable()
 export class GoogleService {
 
-    constructor(private userService: UserService, private authService: AuthService){}
+    constructor(private authService: AuthService, private userService: UserService, ){}
 
     async googleLogin(req: Partial<{user: GoogleUser}>): Promise<{token: string} | null> {
         if(!req.user) {

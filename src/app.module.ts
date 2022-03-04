@@ -18,7 +18,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `${process.cwd()}/configuration/env/${process.env.NODE_ENV.trim()}.env`,
+      envFilePath: `${process.cwd()}/configuration/env/${process.env.NODE_ENV?.trim() || 'development'}.env`,
       load: [configuration]
     }),
     MongooseModule.forRootAsync({
