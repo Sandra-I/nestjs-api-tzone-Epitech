@@ -9,11 +9,10 @@ async function bootstrap() {
     .setTitle('TZone - API')
     .setVersion('1.0')
     .addBearerAuth()
-    .addOAuth2()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
+  app.enableCors();
   /** Use the static port */
   await app.listen(AppModule.port);
 }
