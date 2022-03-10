@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,6 +11,9 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { AuthModule } from './auth/auth.module';
+import { AuthMiddleware } from './middleware/auth.middleware';
+import { JwtAuthGuard } from './auth/jwt-auth-guard';
+import { APP_GUARD } from '@nestjs/core';
 
 /**
  * Set the used port in the constructor
@@ -39,9 +42,15 @@ import { AuthModule } from './auth/auth.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    }
+  ],
 })
-export class AppModule {
+export class AppModule implements NestModule{
   static port: number | string;
   
   /**
@@ -49,5 +58,12 @@ export class AppModule {
    */
   constructor(private readonly configService: ConfigService) {
     AppModule.port = this.configService.get<string>('port');
+  }
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude("auth","auth/redirect")
+      .forRoutes('/')
   }
 }
