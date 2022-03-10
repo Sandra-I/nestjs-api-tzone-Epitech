@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,6 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
+import { JwtAuthGuard } from './auth/jwt-auth-guard';
+import { APP_GUARD } from '@nestjs/core';
 
 /**
  * Set the used port in the constructor
@@ -40,7 +42,9 @@ import { AuthMiddleware } from './middleware/auth.middleware';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {
   static port: number | string;
@@ -55,7 +59,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude("google")
+      .exclude("google", "google/redirect")
       .forRoutes('/')
   }
 }
