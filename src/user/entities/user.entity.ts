@@ -5,6 +5,7 @@ export class User {
     firstName: string;
     lastName: string;
     email: string;
+    isAdmin: boolean;
     history: [{
         text: string;
         date: Date;

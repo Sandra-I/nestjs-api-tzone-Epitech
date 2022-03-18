@@ -1,4 +1,5 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module} from '@nestjs/common';
+import { StripeModule } from 'nestjs-stripe';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,9 +12,9 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { AuthModule } from './auth/auth.module';
-import { AuthMiddleware } from './middleware/auth.middleware';
-import { JwtAuthGuard } from './auth/jwt-auth-guard';
-import { APP_GUARD } from '@nestjs/core';
+import { JwtStrategy } from './auth/jwt.strategy';
+
+const config = configuration();
 
 /**
  * Set the used port in the constructor
@@ -36,30 +37,27 @@ import { APP_GUARD } from '@nestjs/core';
     PassportModule,
     UserModule,
     PlanModule,
+    StripeModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2 days' },
     }),
+    StripeModule.forRoot({
+      apiKey: config.stripe.apiKey,
+      apiVersion: '2020-08-27',
+    }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  ],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {
   static port: number | string;
   
   /**
-   * @param configurationService - [readonly] Used to retrieve the port number
+   * @param configService - [readonly] Used to retrieve the port number
    */
   constructor(private readonly configService: ConfigService) {
     AppModule.port = this.configService.get<string>('port');
   }
 
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude("google", "google/redirect")
-      .forRoutes('/')
-  }
 }

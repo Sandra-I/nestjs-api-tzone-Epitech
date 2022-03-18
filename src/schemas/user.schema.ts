@@ -7,6 +7,7 @@ export const UserSchema = new mongoose.Schema({
     firstName: String,
     lastName: String,
     email: String,
+    isAdmin: Boolean,
     history: [{
         text: String,
         date: Date
