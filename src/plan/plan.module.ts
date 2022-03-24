@@ -6,9 +6,9 @@ import { Plan } from './entities/plan.entity';
 import { PlanSchema } from 'src/schemas/plan.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: Plan.name, schema: PlanSchema}])],
+  imports: [MongooseModule.forFeature([{ name: Plan.name, schema: PlanSchema }])],
   controllers: [PlanController],
   providers: [PlanService],
-  exports: [PlanService]
+  exports: [PlanService],
 })
 export class PlanModule {}

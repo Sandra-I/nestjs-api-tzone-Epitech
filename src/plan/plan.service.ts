@@ -8,14 +8,18 @@ import { Plan } from './entities/plan.entity';
 
 @Injectable()
 export class PlanService {
+  constructor(@InjectModel(Plan.name) private planModel: Model<PlanDocument>) {}
 
-  constructor(@InjectModel(Plan.name) private planModel: Model<PlanDocument>){}
-
-  create(createPlanDto: CreatePlanDto) {
-    return this.planModel.create(createPlanDto);
+  create(plans: Plan[]) {
+    return Promise.all(
+      plans.map(async (plan) => {
+        if (plan.id) await this.planModel.updateOne({ _id: plan.id }, plan).exec();
+        else await new this.planModel(plan).save();
+      }),
+    );
   }
 
-  findAll(): Promise<Plan[]> {
+  async findAll(): Promise<Plan[]> {
     return this.planModel.find().exec();
   }
 
@@ -24,10 +28,10 @@ export class PlanService {
   }
 
   update(id: string, updatePlanDto: UpdatePlanDto) {
-    return this.planModel.updateOne({_id: id}, updatePlanDto).exec();
+    return this.planModel.updateOne({ _id: id }, updatePlanDto).exec();
   }
 
   remove(id: string) {
-    return this.planModel.deleteOne({_id: id}).exec();
+    return this.planModel.deleteOne({ _id: id }).exec();
   }
 }

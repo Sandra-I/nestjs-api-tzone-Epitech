@@ -1,28 +1,30 @@
-import { Plan } from "src/plan/entities/plan.entity";
+import { Plan } from 'src/plan/entities/plan.entity';
 
 export class User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    isAdmin: boolean;
-    history: [{
-        text: string;
-        date: Date;
-    }];
-    settings: {
-        langage: string;
-        preview: boolean;
-    };
-    payment: {
-        date: Date;
-        total: number;
-    }[];
-    subscription: {
-        planId: string;
-        plan?: Plan;
-        startDate: Date;
-        endDate?: Date;
-        annual: boolean;
-    }[];
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isAdmin: boolean;
+  history: [
+    {
+      text: string;
+      date: Date;
+    },
+  ];
+  settings: {
+    langage: string;
+    preview: boolean;
+  };
+  payment: {
+    date: Date;
+    total: number;
+  }[];
+  subscription: {
+    planId: string;
+    plan?: Plan;
+    startDate: Date;
+    endDate?: Date;
+    annual: boolean;
+  }[];
 }
