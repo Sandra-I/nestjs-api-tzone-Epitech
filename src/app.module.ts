@@ -18,7 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './etc/tasks-service';
 
 const config = configuration();
-
+console.log(config.mongodbUri);
 /**
  * Set the used port in the constructor
  */
@@ -32,7 +32,8 @@ const config = configuration();
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodbUri'),
+        // uri: configService.get<string>('mongodbUri'),
+        uri: config.mongodbUri,
       }),
       inject: [ConfigService],
     }),
