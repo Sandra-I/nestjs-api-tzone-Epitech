@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from '../user/user.module';
+import * as passport from 'passport';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { GoogleStrategy } from './google.strategy';
-
+import { PlanModule } from 'src/plan/plan.module';
 @Module({
     imports: [
         UserModule,
+        PlanModule,
         PassportModule,
         JwtModule.register({
             secret: jwtConstants.secret,

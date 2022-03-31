@@ -1,20 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  HttpException,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { Plan } from './entities/plan.entity';
 
 @ApiTags('Subscription Plan')
 @Controller('plan')
 export class PlanController {
-  constructor(private readonly planService: PlanService) { }
+  constructor(private readonly planService: PlanService) {}
 
   @Post()
-  create(@Body() createPlanDto: CreatePlanDto) {
-    return this.planService.create(createPlanDto);
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() body: { plans: Plan[] }, @Request() req) {
+    if (req.user?.isAdmin) return this.planService.create(body.plans);
+    else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
-
-  @Get()
+  @Get('list')
   findAll() {
     return this.planService.findAll();
   }

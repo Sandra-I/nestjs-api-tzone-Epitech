@@ -1,4 +1,5 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { StripeModule } from 'nestjs-stripe';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,23 +12,33 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { AuthModule } from './auth/auth.module';
-import { AuthMiddleware } from './middleware/auth.middleware';
-import { JwtAuthGuard } from './auth/jwt-auth-guard';
-import { APP_GUARD } from '@nestjs/core';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { PaymentModule } from './payment/payment.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './etc/tasks-service';
+
+const config = configuration();
+console.log(process.cwd() + '\\public');
 
 /**
  * Set the used port in the constructor
  */
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     ConfigModule.forRoot({
       envFilePath: `${process.cwd()}/configuration/env/${process.env.NODE_ENV?.trim() || 'development'}.env`,
-      load: [configuration]
+      load: [configuration],
     }),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodbUri')
+        uri: configService.get<string>('mongodbUri'),
       }),
       inject: [ConfigService],
     }),
@@ -36,34 +47,26 @@ import { APP_GUARD } from '@nestjs/core';
     PassportModule,
     UserModule,
     PlanModule,
+    PaymentModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2 days' },
     }),
+    StripeModule.forRoot({
+      apiKey: config.stripe.apiKey,
+      apiVersion: '2020-08-27',
+    }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    }
-  ],
+  providers: [AppService, JwtStrategy, TasksService],
 })
-export class AppModule implements NestModule{
+export class AppModule {
   static port: number | string;
-  
+
   /**
-   * @param configurationService - [readonly] Used to retrieve the port number
+   * @param configService - [readonly] Used to retrieve the port number
    */
   constructor(private readonly configService: ConfigService) {
     AppModule.port = this.configService.get<string>('port');
-  }
-
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude("auth","auth/redirect")
-      .forRoutes('/')
   }
 }

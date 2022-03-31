@@ -1,10 +1,9 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiExcludeEndpoint, ApiOAuth2, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { GoogleService } from './google.service';
 
-@ApiTags('Auth')
-@Controller('auth')
+@Controller('google')
 export class GoogleController {
 
     constructor(private readonly googleService: GoogleService) { }
@@ -17,8 +16,8 @@ export class GoogleController {
     @Get('redirect')
     @UseGuards(AuthGuard('google'))
     @ApiExcludeEndpoint()
-    googleAuthRedirect(@Req() req: any) {
-        const user = this.googleService.googleLogin(req);
-        return user || 'This user doesn\'t exists'
+    async googleAuthRedirect(@Req() req: any) {
+        const user = await this.googleService.googleLogin(req);
+        return `<script>window.opener.postMessage(${JSON.stringify(user)}, "*"); window.close();</script>`;
     }
 }

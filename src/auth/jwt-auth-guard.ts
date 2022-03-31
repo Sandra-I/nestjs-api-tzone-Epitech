@@ -14,15 +14,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         
         if(path == "/auth") return true;
         
-        const rawAuthorization = responce.headers["authorization"]
+        const rawAuthorization = responce.headers["authorization"];
         if(rawAuthorization){
             const AuthorizationData = rawAuthorization.split(" ");
             try {
                 const token = this.jwtService.verify(AuthorizationData[1]);
-                console.log(token, AuthorizationData[1])
                 if(token) return super.canActivate(context);
             } catch (error) {
-                console.log("Malformed token:", AuthorizationData[1])
                 return false;
             }
         }
