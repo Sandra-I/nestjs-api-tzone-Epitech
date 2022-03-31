@@ -26,6 +26,13 @@ export class PaymentController {
   @UseGuards(AuthGuard('jwt'))
   async AddPayment(@Body('planId') planId: string, @Body('annual') annual: boolean, @Req() req) {
     const plan = await this.planService.findOne(planId);
-    return this.userService.addSubscription(plan, annual, req.user.id);
+    await this.userService.addSubscription(plan, annual, req.user.id);
+    this.stripeService.newPayment(req.user.id);
+  }
+
+  @Post('test')
+  @UseGuards(AuthGuard('jwt'))
+  async test(@Req() req) {
+    this.stripeService.newPayment(req.user.id);
   }
 }

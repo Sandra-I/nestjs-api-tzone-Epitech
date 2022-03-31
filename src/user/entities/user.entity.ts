@@ -1,3 +1,4 @@
+import * as mongoose from 'mongoose';
 import { Plan } from 'src/plan/entities/plan.entity';
 
 export class User {
@@ -16,10 +17,7 @@ export class User {
     langage: string;
     preview: boolean;
   };
-  payment: {
-    date: Date;
-    total: number;
-  }[];
+  payment: mongoose.Types.ObjectId[];
   subscription: {
     planId: string;
     plan?: Plan;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model, Mongoose } from 'mongoose';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { UserDocument } from 'src/schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -22,9 +22,9 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: string): Promise<UserDocument> {
+  findOne(id: string): Promise<any> {
     /** @Todo - Middleware Authentification */
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(id).populate('payment').exec();
   }
 
   findWithEmail(email: string): Promise<UserDocument> {
@@ -57,19 +57,18 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  async addSubscription(plan: Plan, annual: boolean, userId: string) {
+  async addSubscription(plan: Plan, annual: boolean, userId: string): Promise<void> {
     const user = await this.userModel.findById(userId).exec();
     user.subscription.push({
       planId: plan.id,
       startDate: new Date(),
       annual,
     });
-    user.payment.push({ date: new Date(), total: annual ? plan.annuelPrice : plan.price });
-    return user.save();
+    user.save();
   }
 
   public async cancelSubscription(userId: string): Promise<void> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).exec();
     if (!user.subscription[user.subscription.length - 1].endDate) {
       user.subscription[user.subscription.length - 1].endDate = new Date();
     }

@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import { User } from 'src/user/entities/user.entity';
+import { PaymentSchema } from './payment.schema';
 
 export type UserDocument = User & Document;
 
@@ -22,12 +23,10 @@ export const UserSchema = new mongoose.Schema({
     langage: String,
     preview: Boolean,
   },
-  payment: [
-    {
-      date: Date,
-      total: Number,
-    },
-  ],
+  payment: {
+    type: [mongoose.Types.ObjectId],
+    ref: 'Payment',
+  },
   subscription: [
     {
       planId: {
