@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, Model, Mongoose } from 'mongoose';
+import { Model } from 'mongoose';
+import { Payment } from 'src/payment/entities/payment.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { UserDocument } from 'src/schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,7 +20,7 @@ export class UserService {
   }
 
   findAll(filter?: User) {
-    return `This action returns all user`;
+    return this.userModel.find().exec();
   }
 
   findOne(id: string): Promise<any> {
@@ -64,7 +65,7 @@ export class UserService {
       startDate: new Date(),
       annual,
     });
-    user.save();
+    await user.save();
   }
 
   public async cancelSubscription(userId: string): Promise<void> {
@@ -73,5 +74,16 @@ export class UserService {
       user.subscription[user.subscription.length - 1].endDate = new Date();
     }
     user.save();
+  }
+
+  public getSubscriptionFromPayment(user: User, payment: Payment): User['subscription'][number] {
+    const paymentDate = new Date(payment.date).getTime();
+    for (const subscription of user.subscription) {
+      const start = new Date(subscription.startDate).getTime();
+      const end = subscription.endDate && new Date(subscription.endDate).getTime();
+      if (start < paymentDate && (!end || end > paymentDate)) {
+        return subscription;
+      }
+    }
   }
 }

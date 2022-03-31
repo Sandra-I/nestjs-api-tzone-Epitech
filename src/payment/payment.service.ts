@@ -47,12 +47,12 @@ export class PaymentService {
     const user = await this.userService.findOne(userId);
     const currentSubscription = user?.subscription.find((sub) => !sub.endDate);
     if (currentSubscription) {
-      const billingNumber = await this._genetareInvoiceNumber();
+      const invoiceNumber = await this._genetareInvoiceNumber();
       const plan = await this.planService.findOne(currentSubscription.planId);
       const payment = new this.paymentModel({
         date: new Date(),
         total: currentSubscription.annual ? plan.annuelPrice : plan.price,
-        billingNumber,
+        invoiceNumber,
       });
       await payment.save();
       user.payment.push(payment._id);

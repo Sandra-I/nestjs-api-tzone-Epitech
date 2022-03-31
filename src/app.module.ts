@@ -14,18 +14,27 @@ import { jwtConstants } from './auth/constants';
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { PaymentModule } from './payment/payment.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './etc/tasks-service';
 
 const config = configuration();
+console.log(process.cwd() + '\\public');
 
 /**
  * Set the used port in the constructor
  */
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     ConfigModule.forRoot({
       envFilePath: `${process.cwd()}/configuration/env/${process.env.NODE_ENV?.trim() || 'development'}.env`,
       load: [configuration],
     }),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -49,7 +58,7 @@ const config = configuration();
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, TasksService],
 })
 export class AppModule {
   static port: number | string;

@@ -25,8 +25,8 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Req() req) {
+    return req.user.isAdmin ? this.userService.findAll() : null;
   }
 
   @Get('me')
