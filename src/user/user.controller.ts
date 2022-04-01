@@ -14,14 +14,14 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from './entities/user.entity';
+import { PlanService } from 'src/plan/plan.service';
 
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly planService: PlanService) {}
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
@@ -34,7 +34,16 @@ export class UserController {
   async findMe(@Request() req) {
     const user = await this.userService.findOne(req.user.id);
     if (!user) throw new HttpException('No user found', HttpStatus.NOT_FOUND);
-    // user.permissions = req.user.plan
+    const planId = user.subscription.find((current) => !current.endDate)?.planId;
+    const plan = planId ? await this.planService.findOne(planId) : null;
+    user.permissions = {
+      selection: plan?.selection || true,
+      preview: plan?.preview || true,
+      history: plan?.history || false,
+      translation: plan?.translation || false,
+      capture: plan?.capture || false,
+      quickCapture: plan?.quickCapture || false,
+    };
     return user;
   }
 
@@ -52,8 +61,12 @@ export class UserController {
 
   @Post('history')
   @UseGuards(AuthGuard('jwt'))
-  async addHistory(@Param('history') history: User['history'][number], @Request() req) {
-    return this.userService.updateHistory(history, req.user);
+  @ApiParam({
+    type: `string`,
+    name: 'text',
+  })
+  async addHistory(@Param('text') text: string, @Request() req) {
+    return this.userService.updateHistory(text, req.user);
   }
 
   @Patch(':id')
