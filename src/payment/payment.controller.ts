@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Controller, UseGuards, Post, Param, Body, Req, Get, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PaymentService } from './payment.service';
 import { PlanService } from 'src/plan/plan.service';
@@ -19,6 +19,14 @@ export class PaymentController {
 
   @Post('init')
   @UseGuards(AuthGuard('jwt'))
+  @ApiParam({
+    type: `string`,
+    name: 'planId',
+  })
+  @ApiParam({
+    type: `boolean`,
+    name: 'annual',
+  })
   async initPayment(@Body('planId') planId: string, @Body('annual') annual: boolean) {
     const plan = await this.planService.findOne(planId);
     const amount = annual ? plan.annuelPrice : plan.price;
@@ -27,15 +35,17 @@ export class PaymentController {
 
   @Post('add')
   @UseGuards(AuthGuard('jwt'))
+  @ApiParam({
+    type: `string`,
+    name: 'planId',
+  })
+  @ApiParam({
+    type: `boolean`,
+    name: 'annual',
+  })
   async AddPayment(@Body('planId') planId: string, @Body('annual') annual: boolean, @Req() req) {
     const plan = await this.planService.findOne(planId);
     await this.userService.addSubscription(plan, annual, req.user.id);
-    this.stripeService.newPayment(req.user.id);
-  }
-
-  @Post('test')
-  @UseGuards(AuthGuard('jwt'))
-  async test(@Req() req) {
     this.stripeService.newPayment(req.user.id);
   }
 
