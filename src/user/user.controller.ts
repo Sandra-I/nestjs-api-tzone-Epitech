@@ -32,7 +32,7 @@ export class UserController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   async findMe(@Request() req) {
-    const user = await this.userService.findOne(req.user.id);
+    const user = await this.userService.findOne(req.user.id, true);
     if (!user) throw new HttpException('No user found', HttpStatus.NOT_FOUND);
     // user.permissions = req.user.plan
     return user;
