@@ -53,7 +53,7 @@ export class UserController {
   @Post('history')
   @UseGuards(AuthGuard('jwt'))
   async addHistory(@Param('history') history: User['history'][number], @Request() req) {
-    return this.userService.updateHistory(history, req);
+    return this.userService.updateHistory(history, req.user);
   }
 
   @Patch(':id')
