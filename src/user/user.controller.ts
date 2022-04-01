@@ -60,7 +60,6 @@ export class UserController {
     name: 'text',
   })
   async addHistory(@Body('text') text: string, @Request() req) {
-    req.user = { id: '62459f50f7116214b76dc360' };
     return this.userService.updateHistory(text, req.user);
   }
 
