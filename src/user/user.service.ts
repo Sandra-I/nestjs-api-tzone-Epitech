@@ -45,9 +45,9 @@ export class UserService {
     return this.userModel.updateOne({ _id: user.id }, user);
   }
 
-  async updateHistory(history: User['history'][number], user: User) {
+  async updateHistory(text: string, user: User) {
     const userData = await this.userModel.findById(user.id).exec();
-    userData.history.push({ ...history, date: new Date() });
+    userData.history.push({ text, date: new Date() });
     if (userData.history.length > 20) {
       userData.history.splice(0, 1);
     }
