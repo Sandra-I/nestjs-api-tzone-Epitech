@@ -53,20 +53,21 @@ export class UserController {
     return this.userService.cancelSubscription(req.user.id);
   }
 
-  @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
-  }
-
   @Post('history')
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({
     type: `string`,
     name: 'text',
   })
-  async addHistory(@Param('text') text: string, @Request() req) {
+  async addHistory(@Body('text') text: string, @Request() req) {
+    req.user = { id: '62459f50f7116214b76dc360' };
     return this.userService.updateHistory(text, req.user);
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
+  findOne(@Param('id') id: string) {
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
