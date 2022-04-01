@@ -25,7 +25,7 @@ export class UserService {
 
   findOne(id: string): Promise<any> {
     /** @Todo - Middleware Authentification */
-    return this.userModel.findById(id).populate('payment').exec();
+    return this.userModel.findById(id).populate('payment').lean().exec();
   }
 
   findWithEmail(email: string): Promise<UserDocument> {
