@@ -44,6 +44,7 @@ export class UserController {
       capture: plan?.capture || false,
       quickCapture: plan?.quickCapture || false,
     };
+    user.history = user.history.reverse().splice(0, 20);
     return user;
   }
 
